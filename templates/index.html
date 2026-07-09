@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JazzVibe-AI | Premium Jazz Music Generation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="header-title">🎵 JazzVibe-AI</h1>
+                <p class="header-subtitle">Premium AI-Powered Jazz Music Generation</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Control Panel -->
+            <div class="control-panel glass-card">
+                <h2 class="panel-title">Generation Controls</h2>
+                
+                <div class="control-group">
+                    <label for="num-notes" class="control-label">
+                        Number of Notes
+                        <span class="control-value" id="notes-value">500</span>
+                    </label>
+                    <input type="range" id="num-notes" class="control-slider" min="100" max="1000" value="500" step="50">
+                    <div class="slider-labels">
+                        <span>100</span>
+                        <span>1000</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label for="temperature" class="control-label">
+                        Creativity Level
+                        <span class="control-value" id="temp-value">1.0</span>
+                    </label>
+                    <input type="range" id="temperature" class="control-slider" min="0.5" max="2.0" value="1.0" step="0.1">
+                    <div class="slider-labels">
+                        <span>Conservative</span>
+                        <span>Creative</span>
+                    </div>
+                </div>
+
+                <button id="generate-btn" class="generate-button">
+                    <span class="button-text">Generate Jazz Music</span>
+                    <span class="button-icon">🎹</span>
+                </button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-container" class="loading-container hidden">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Generating beautiful jazz music...</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <div class="loading-status" id="loading-status">Initializing...</div>
+            </div>
+
+            <!-- Result Panel -->
+            <div id="result-panel" class="result-panel glass-card hidden">
+                <h2 class="panel-title">Generated Music</h2>
+                
+                <div class="audio-player-container">
+                    <div class="audio-info">
+                        <div class="audio-icon">🎵</div>
+                        <div class="audio-details">
+                            <h3 class="audio-title">Jazz Composition Ready</h3>
+                            <p class="audio-description">Your AI-generated jazz MIDI file is ready for download</p>
+                        </div>
+                    </div>
+                    
+                    <div class="midi-info">
+                        <div class="midi-info-item">
+                            <span class="midi-info-label">Format:</span>
+                            <span class="midi-info-value">MIDI (.mid)</span>
+                        </div>
+                        <div class="midi-info-item">
+                            <span class="midi-info-label">Instrument:</span>
+                            <span class="midi-info-value">Piano</span>
+                        </div>
+                        <div class="midi-info-item">
+                            <span class="midi-info-label">Notes:</span>
+                            <span class="midi-info-value" id="notes-count">500</span>
+                        </div>
+                    </div>
+                    
+                    <div class="audio-actions">
+                        <a id="download-btn" href="#" class="download-button" download>
+                            <span class="download-icon">⬇️</span>
+                            <span class="download-text">Download MIDI File</span>
+                        </a>
+                        <button id="regenerate-btn" class="regenerate-button">
+                            <span class="regenerate-icon">🔄</span>
+                            <span class="regenerate-text">Generate New</span>
+                        </button>
+                    </div>
+                    
+                    <div class="midi-notice">
+                        <p>💡 <strong>Note:</strong> MIDI files can be played with any digital audio workstation (DAW), media player with MIDI support, or online MIDI players.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card glass-card">
+                    <div class="info-icon">⚡</div>
+                    <h3 class="info-title">Fast Generation</h3>
+                    <p class="info-description">Generate jazz music in seconds using advanced AI algorithms</p>
+                </div>
+                
+                <div class="info-card glass-card">
+                    <div class="info-icon">🎨</div>
+                    <h3 class="info-title">Customizable</h3>
+                    <p class="info-description">Adjust creativity and length to match your preferences</p>
+                </div>
+                
+                <div class="info-card glass-card">
+                    <div class="info-icon">📥</div>
+                    <h3 class="info-title">Instant Download</h3>
+                    <p class="info-description">Download your generated MIDI files immediately</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Built with ❤️ by Azizullah Naik using Flask & Music21</p>
+            <p>© 2024 JazzVibe-AI | Premium AI Music Generation</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
