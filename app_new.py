@@ -1,6 +1,7 @@
 """
 JazzVibe-AI: Premium Flask Web Application for Jazz Music Generation
 Using pre-trained models for fast, CPU-friendly music generation
+Optimized specifically for Vercel Serverless Environments
 """
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
@@ -12,15 +13,15 @@ import numpy as np
 from music21 import stream, note, chord, instrument, tempo
 import random
 
-app = Flask(__name__)
+# Vercel deployment core patch for explicit static handling
+app = Flask(__name__, 
+            static_url_path='/static',
+            static_folder='static',
+            template_folder='templates')
 
-# Configuration
-app.config['OUTPUT_FOLDER'] = 'static/outputs'
+# Configuration - Using Vercel's allowed /tmp partition for serverless execution
+app.config['OUTPUT_FOLDER'] = '/tmp'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload
-
-# Ensure output directory exists
-os.makedirs(app.config['OUTPUT_FOLDER'], exist_ok=True)
-
 
 class SimpleJazzGenerator:
     """Simple jazz music generator using probabilistic patterns"""
@@ -47,12 +48,9 @@ class SimpleJazzGenerator:
     def generate_jazz_sequence(self, num_notes=500, temperature=1.0):
         """Generate a jazz-like note sequence"""
         generated_notes = []
-        
-        # Start with a random note from the scale
         scale = self.jazz_scales[self.current_scale]
         
         for i in range(num_notes):
-            # Randomly choose between single notes and chords
             if random.random() < 0.7:  # 70% single notes
                 note_name = random.choice(scale)
                 octave = random.choice([3, 4, 5])
@@ -77,7 +75,6 @@ class SimpleJazzGenerator:
         
         for element in notes:
             if '.' in element:
-                # It's a chord
                 chord_notes = element.split('.')
                 try:
                     notes_obj = [note.Note(n) for n in chord_notes]
@@ -89,9 +86,8 @@ class SimpleJazzGenerator:
                     valid_notes += 1
                 except Exception as e:
                     print(f"Error creating chord: {e}")
-                    pass  # Skip invalid notes
+                    pass
             else:
-                # It's a note
                 try:
                     note_obj = note.Note(element)
                     note_obj.offset = offset
@@ -101,7 +97,7 @@ class SimpleJazzGenerator:
                     valid_notes += 1
                 except Exception as e:
                     print(f"Error creating note: {e}")
-                    pass  # Skip invalid notes
+                    pass
             
             offset += 0.5
         
@@ -110,43 +106,31 @@ class SimpleJazzGenerator:
     
     def generate_and_save(self, output_path, num_notes=500, temperature=1.0):
         """Generate and save MIDI file"""
-        # Generate notes
         notes = self.generate_jazz_sequence(num_notes, temperature)
-        
-        # Create MIDI stream
         midi_stream = self.create_midi_stream(notes)
-        
-        # Save MIDI
         midi_stream.write('midi', fp=output_path)
-        
         return output_path, notes
-
 
 # Initialize generator
 generator = SimpleJazzGenerator()
-
 
 @app.route('/')
 def index():
     """Render the main page"""
     return render_template('index.html')
 
-
 @app.route('/generate', methods=['POST'])
 def generate():
     """Handle music generation request"""
     try:
-        # Get parameters from request
-        data = request.get_json()
+        data = request.get_json() or {}
         num_notes = int(data.get('num_notes', 500))
         temperature = float(data.get('temperature', 1.0))
         
-        # Generate unique filename
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"jazz_{timestamp}_{uuid.uuid4().hex[:8]}.mid"
         output_path = os.path.join(app.config['OUTPUT_FOLDER'], filename)
         
-        # Generate music
         generator.generate_and_save(
             output_path=output_path,
             num_notes=num_notes,
@@ -165,10 +149,9 @@ def generate():
             'error': str(e)
         }), 500
 
-
 @app.route('/download/<filename>')
 def download(filename):
-    """Download generated MIDI file"""
+    """Download generated MIDI file from serverless storage"""
     return send_from_directory(
         app.config['OUTPUT_FOLDER'],
         filename,
@@ -176,15 +159,10 @@ def download(filename):
         download_name=f'jazz_generated_{filename}'
     )
 
-
 @app.route('/outputs/<filename>')
 def serve_output(filename):
-    """Serve generated MIDI file for playback"""
+    """Serve generated MIDI file for playback from /tmp"""
     return send_from_directory(app.config['OUTPUT_FOLDER'], filename)
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
-# WSGI handler for Vercel/Gunicorn
-app = app
