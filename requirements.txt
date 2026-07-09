@@ -1,0 +1,10 @@
+# Core Dependencies
+Flask>=3.0.0
+gunicorn>=21.2.0
+numpy>=1.26.0
+
+# Music Processing
+music21>=9.1.0
+
+# Utilities
+tqdm>=4.66.0
